@@ -200,7 +200,7 @@ Y = np.copy(Y_exp)
 
 ### output #################################################
 
-nn = neural_network(n_iter=300)
+nn = neural_network(n_iter=100)
 nn.fit(X,Y)
 
 guess   = nn.predict(X)[1]
@@ -208,5 +208,13 @@ correct = round(sum(np.argmax(guess,axis=1) + 1 == \
           np.argmax(Y,axis=1) + 1) / X.shape[0] * 100,1)
 
 print("\n   Amount Correct = {}".format(correct))
+print("")
+
+weights = np.append(nn.w1_,nn.w2_)
+np.savetxt('weights.csv',weights,delimiter=',')
+
+print("   The weights were saved to the 'weights.csv' file.")
+print("")
+print("   END")
 
 ### END ####################################################
