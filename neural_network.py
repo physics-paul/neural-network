@@ -8,12 +8,9 @@ Date:     12/17/2018
 
 *********************************************************"""
 
-from sklearn.linear_model import LogisticRegression
-from pdb import set_trace as pb
-from scipy import io
-from PIL import Image as im
-import matplotlib.pyplot as plt
-import numpy as np
+############################################################
+###               CLASS : NEURAL NETWORK                 ###
+############################################################
 
 class neural_network:
     """Neural Network.
@@ -43,6 +40,12 @@ class neural_network:
       Logistic regression cost function value in each epoc.
 
     """
+
+    print("")
+    print("   NEURAL NETWORK INITIALIZED")
+    print("   CREATED BY : PAUL SANDERS")
+    print("")
+    
     def __init__(self,n_nodes=25,eta=3.0,lambd=0.0,n_iter=1000):
         self.n_nodes = n_nodes
         self.eta     = eta
@@ -65,6 +68,9 @@ class neural_network:
 
         """
 
+        print('   Please be patient. The cost is being minimized.')
+        print('')
+        
         S = X.shape[0]
         M = X.shape[1]
         K = Y.shape[1]
@@ -80,8 +86,11 @@ class neural_network:
             self.w1_ += dw1_
             self.w2_ += dw2_
             self.cost_.append(self.cost(X,Y))
-            print('cost = {}'.format(round(self.cost_[-1],7)),end="\r")
-            
+            print('   cost = {}'.format(round(self.cost_[-1],7)),end="\r")
+
+        print('')
+        print('\n   Minimization Complete.')
+        
     def activation(self,X,theta):
         """Compute logistic sigmoid activation"""
 
@@ -99,11 +108,11 @@ class neural_network:
 
         for i in range(self.w1_.shape[0]):
 
-            hidden_layer[:,i] = activation(X,self.w1_[i])   
+            hidden_layer[:,i] = self.activation(X,self.w1_[i])   
 
         for i in range(self.w2_.shape[0]):
 
-            output_layer[:,i] = activation(hidden_layer,self.w2_[i])
+            output_layer[:,i] = self.activation(hidden_layer,self.w2_[i])
 
         return hidden_layer,output_layer
 
@@ -112,7 +121,7 @@ class neural_network:
 
         S = X.shape[0]
 
-        activate = predict(X,self.w1_,self.w2_)[1]
+        activate = self.predict(X)[1]
 
         J = -1 / S * (Y * np.log(activate)           \
             + (1-Y) * np.log(1-activate)).sum( )     \
@@ -126,7 +135,7 @@ class neural_network:
 
         S = X.shape[0]
 
-        a2,a3 = predict(X,self.w1_,self.w2_)
+        a2,a3 = self.predict(X)
 
         """Calculate w2 weights"""
 
@@ -148,6 +157,13 @@ class neural_network:
         dw1_ = self.eta * (1 / S * Delta1 + self.lambd / S * self.w1_)
 
         return dw1_,dw2_
+
+############################################################
+###             END CLASS : NEURAL NETWORK               ###
+############################################################
+
+from scipy import io
+import numpy as np
 
 ### Get data ###############################################
 
@@ -184,4 +200,13 @@ Y = np.copy(Y_exp)
 
 ### output #################################################
 
-nn = neural_network()
+nn = neural_network(n_iter=300)
+nn.fit(X,Y)
+
+guess   = nn.predict(X)[1]
+correct = round(sum(np.argmax(guess,axis=1) + 1 == \
+          np.argmax(Y,axis=1) + 1) / X.shape[0] * 100,1)
+
+print("\n   Amount Correct = {}".format(correct))
+
+### END ####################################################
